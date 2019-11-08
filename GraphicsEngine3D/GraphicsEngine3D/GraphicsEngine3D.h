@@ -17,8 +17,8 @@
 class GraphicsEngine3D
 {
 public:
-	GraphicsEngine3D();
-	~GraphicsEngine3D();
+	GraphicsEngine3D(unsigned char instance = 0) : instance(instance) {}
+
 public:
 	enum class COLOUR //Foreground text color values
 	{
@@ -63,24 +63,11 @@ public:
 		PIXEL_QUARTER = 0x2591
 	};
 public:
-	int getConsoleWindowWidth() const;
-	int getConsoleWindowHeight() const;
+	virtual int getConsoleWindowWidth() const = 0;
+	virtual int getConsoleWindowHeight() const = 0;
 protected:
-	int CreateConsoleWindow(int width, int height, int fontSizeX, int fontSizeY);
-	virtual void setConsoleAppName(const wchar_t *c_AppName);
-private:
-	int ErrMsg(const wchar_t *msg);
-	int c_ScreenWidth;
-	int c_ScreenHeight;
-	CHAR_INFO *c_ScreenBuffer;
-	HANDLE c_OriginalConsole;
-	HANDLE c_ConsoleOut;
-	HANDLE c_ConsoleIn;
-	CONSOLE_SCREEN_BUFFER_INFO c_OriginalConsoleInfo;
-	CONSOLE_FONT_INFOEX c_ConsoleFontIndex;
-	CONSOLE_SCREEN_BUFFER_INFO c_ConsoleScreenBufferInfo;
-	SMALL_RECT c_rectWindow;
-	COORD c_ConsoleSpace;
-	std::wstring c_AppName;
+	const unsigned char instance;
+	virtual int CreateConsoleWindow(int width, int height, int fontSizeX, int fontSizeY) = 0;
+	virtual inline volatile const std::wstring getConsoleAppName() const noexcept = 0;
 };
 
