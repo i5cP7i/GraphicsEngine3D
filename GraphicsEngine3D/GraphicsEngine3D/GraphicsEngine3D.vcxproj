@@ -148,7 +148,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+<<<<<<< Updated upstream
     <ClCompile Include="GraphicsEngine3D.cpp" />
+=======
+    <ClCompile Include="Cube.cpp" />
+    <ClCompile Include="Initialize.cpp" />
+    <ClCompile Include="Instance.cpp" />
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Cube.h" />
+    <ClInclude Include="GraphicsEngine3D.h" />
+    <ClInclude Include="Initialize.h" />
+    <ClInclude Include="Instance.h" />
+    <ClInclude Include="Polygon3D.h" />
+>>>>>>> Stashed changes
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
