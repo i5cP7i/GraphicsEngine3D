@@ -3,17 +3,12 @@
 
 Cube::Cube()
 {
+    CreateMesh();
 }
 
-
-Cube::~Cube()
+void Cube::demoCube(Instance* i)
 {
-
-}
-
-void Cube::demoCube()
-{
-    //fTheta += 1.0f * getInstance()->fElapsedTime;
+    fTheta += 1.0f * i->fElapsedTime;
     //Rotation z
     matRotZ.m[0][0] = cosf(fTheta);
     matRotZ.m[0][1] = sinf(fTheta);
@@ -62,18 +57,18 @@ void Cube::demoCube()
         triProjected.p[1].x += 1.0f; triProjected.p[1].y += 1.0f;
         triProjected.p[2].x += 1.0f; triProjected.p[2].y += 1.0f;
 
-        //triProjected.p[0].x *= 0.5f * static_cast<float>(getInstance()->getConsoleWindowWidth());
-        //triProjected.p[0].y *= 0.5f * static_cast<float>(getInstance()->getConsoleWindowHeight());
-        //triProjected.p[1].x *= 0.5f * static_cast<float>(getInstance()->getConsoleWindowWidth());
-        //triProjected.p[1].y *= 0.5f * static_cast<float>(getInstance()->getConsoleWindowHeight());
-        //triProjected.p[2].x *= 0.5f * static_cast<float>(getInstance()->getConsoleWindowWidth());
-        //triProjected.p[2].y *= 0.5f * static_cast<float>(getInstance()->getConsoleWindowHeight());
-        /*
-        getInstance()->drawTriangle(triProjected.p[0].x, triProjected.p[0].y,
+        triProjected.p[0].x *= 0.5f * static_cast<float>(i->getConsoleWindowWidth());
+        triProjected.p[0].y *= 0.5f * static_cast<float>(i->getConsoleWindowHeight());
+        triProjected.p[1].x *= 0.5f * static_cast<float>(i->getConsoleWindowWidth());
+        triProjected.p[1].y *= 0.5f * static_cast<float>(i->getConsoleWindowHeight());
+        triProjected.p[2].x *= 0.5f * static_cast<float>(i->getConsoleWindowWidth());
+        triProjected.p[2].y *= 0.5f * static_cast<float>(i->getConsoleWindowHeight());
+
+        i->drawTriangle(triProjected.p[0].x, triProjected.p[0].y,
             triProjected.p[1].x, triProjected.p[1].y,
             triProjected.p[2].x, triProjected.p[2].y,
-            getInstance()->PIXEL_SOLID, getInstance()->FG_WHITE);
-        */
+            i->PIXEL_SOLID, i->FG_WHITE);
+
     }
 }
 
@@ -107,15 +102,15 @@ void Cube::CreateMesh()
 
     };
 }
-void Cube::setProjectionMatrix(mat4x4 &matrix, float fZn, float fZf, float fFOV, float fAspectRatio, float fFOVRad)
+void Cube::setProjectionMatrix(Instance *i, float fZn, float fZf, float fFOV)
 {
-    //this->fAspectRatio = static_cast<float>(getInstance()->getConsoleWindowHeight()) / static_cast<float>(getInstance()->getConsoleWindowWidth());
+    this->fAspectRatio = static_cast<float>(i->getConsoleWindowHeight()) / static_cast<float>(i->getConsoleWindowWidth());
     this->fFOVRad = 1.0f / tanf(fFOV * 0.5f / 180.0f * 3.14159f);
 
-    matrix.m[0][0] = fAspectRatio * fFOVRad;
-    matrix.m[1][1] = fFOVRad;
-    matrix.m[2][2] = 1.0f / (1.0f - fZn / fZf);
-    matrix.m[2][3] = 1.0f;
-    matrix.m[3][2] = -(fZn) / (1.0f - fZn / fZf);
-    matrix.m[3][3] = 0.0f;
+    matProj.m[0][0] = fAspectRatio * fFOVRad;
+    matProj.m[1][1] = fFOVRad;
+    matProj.m[2][2] = 1.0f / (1.0f - fZn / fZf);
+    matProj.m[2][3] = 1.0f;
+    matProj.m[3][2] = -(fZn) / (1.0f - fZn / fZf);
+    matProj.m[3][3] = 0.0f;
 }

@@ -1,4 +1,7 @@
 #include "Instance.h"
+#include "Initialize.h"
+#include "Cube.h"
+#include "math.h"
 
 std::atomic<bool> Instance::bAtomicActive;
 std::condition_variable Instance::EngineFinished;
@@ -14,13 +17,10 @@ Instance::Instance(unsigned char id) : GraphicsEngine3D (id)
 
 	c_AppName = L"Graphics Engine 3D";
 }
-
-
 Instance::~Instance()
 {
-
+    delete cube;
 }
-
 int Instance::CreateConsoleWindow(int width, int height, int fontSizeX, int fontSizeY)
 {
 	//TODO error
@@ -55,7 +55,7 @@ int Instance::CreateConsoleWindow(int width, int height, int fontSizeX, int font
 	//TODO: ERROR CODE
 
 	//Set physical console window size
-	c_rectWindow = { 0, 0, static_cast<short>(c_ScreenWidth) - 1, static_cast<short>(c_ScreenHeight) - 1 };
+    c_rectWindow = { 0, 0, static_cast<SHORT>(c_ScreenWidth - 1), static_cast<SHORT>(c_ScreenHeight - 1)};
 	SetConsoleWindowInfo(c_ConsoleOut, TRUE, &c_rectWindow);
 
 	//Allocate memory for screen buffer
@@ -67,13 +67,15 @@ int Instance::CreateConsoleWindow(int width, int height, int fontSizeX, int font
 	SetConsoleCursorInfo(c_ConsoleOut, &c_ConsoleCursorInfo);
 	SetConsoleMode(c_ConsoleIn, ENABLE_EXTENDED_FLAGS | ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT);
 
-	SetConsoleCtrlHandler((PHANDLER_ROUTINE)CloseHandler, TRUE);
+    SetConsoleCtrlHandler(static_cast<PHANDLER_ROUTINE>(CloseHandler), TRUE);
 	return 1;
 }
 
-// Create
+// Create objects
 bool Instance::EngineCreate()
 {
+    cube = new Cube[1];
+    cube->setProjectionMatrix(this, 0.1f, 1000.0f, 90.0f);
 	return true;
 }
 
@@ -81,6 +83,8 @@ bool Instance::EngineCreate()
 bool Instance::EngineUpdate(float fElapsedTime)
 {
 	Fill(0, 0, getConsoleWindowWidth(), getConsoleWindowHeight(), PIXEL_SOLID, FG_BLACK);
+    // Engine code goes here
+    cube->demoCube(this);
 	return true;
 }
 
@@ -152,69 +156,61 @@ int Instance::ErrMsg(const wchar_t * msg)
 	return 0;
 }
 
-void Instance::drawLine(int x1, int x2, int y1, int y2)
+void Instance::drawLine(int x1, int y1, int x2, int y2)
 {
-	drawLine(x1, x2, y1, y2, GraphicsEngine3D::PIXEL_TYPE::PIXEL_SOLID, GraphicsEngine3D::COLOR::FG_WHITE);
+    drawLine(x1, y1, x2, y2, GraphicsEngine3D::PIXEL_TYPE::PIXEL_SOLID, GraphicsEngine3D::COLOR::FG_WHITE);
 }
 
-void Instance::drawLine(int x1, int x2, int y1, int y2, GraphicsEngine3D::PIXEL_TYPE pxt, GraphicsEngine3D::COLOR cl)
+void Instance::drawLine(int x1, int y1, int x2, int y2, GraphicsEngine3D::PIXEL_TYPE pxt, GraphicsEngine3D::COLOR cl)
 {
-	int x, y, dx, dy, dx1, dy1, px, py, xe, ye, i;
-	dx = x2 - x1; dy = y2 - y1;
-	dx1 = abs(dx); dy1 = abs(dy);
-	px = 2 * dy1 - dx1;	py = 2 * dx1 - dy1;
-	if (dy1 <= dx1)
-	{
-		if (dx >= 0)
-		{
-			x = x1; y = y1; xe = x2;
-		}
-		else
-		{
-			x = x2; y = y2; xe = x1;
-		}
+    int x, y, dx, dy, dx1, dy1, px, py, xe, ye, i;
+    dx = x2 - x1; dy = y2 - y1;
+    dx1 = abs(dx); dy1 = abs(dy);
+    px = 2 * dy1 - dx1;	py = 2 * dx1 - dy1;
+    if (dy1 <= dx1)
+    {
+        if (dx >= 0)
+            { x = x1; y = y1; xe = x2; }
+        else
+            { x = x2; y = y2; xe = x1;}
 
-		draw(x, y, pxt, cl);
+        draw(x, y, pxt, cl);
 
-		for (i = 0; x<xe; i++)
-		{
-			x = x + 1;
-			if (px<0)
-				px = px + 2 * dy1;
-			else
-			{
-				if ((dx<0 && dy<0) || (dx>0 && dy>0)) y = y + 1; else y = y - 1;
-				px = px + 2 * (dy1 - dx1);
-			}
-			draw(x, y, pxt, cl);
-		}
-	}
-	else
-	{
-		if (dy >= 0)
-		{
-			x = x1; y = y1; ye = y2;
-		}
-		else
-		{
-			x = x2; y = y2; ye = y1;
-		}
+        for (i = 0; x<xe; i++)
+        {
+            x = x + 1;
+            if (px<0)
+                px = px + 2 * dy1;
+            else
+            {
+                if ((dx<0 && dy<0) || (dx>0 && dy>0)) y = y + 1; else y = y - 1;
+                px = px + 2 * (dy1 - dx1);
+            }
+            draw(x, y, pxt, cl);
+        }
+    }
+    else
+    {
+        if (dy >= 0)
+            { x = x1; y = y1; ye = y2; }
+        else
+            { x = x2; y = y2; ye = y1; }
 
-		draw(x, y, pxt, cl);
+        draw(x, y, pxt, cl);
 
-		for (i = 0; y<ye; i++)
-		{
-			y = y + 1;
-			if (py <= 0)
-				py = py + 2 * dx1;
-			else
-			{
-				if ((dx<0 && dy<0) || (dx>0 && dy>0)) x = x + 1; else x = x - 1;
-				py = py + 2 * (dx1 - dy1);
-			}
-			draw(x, y, pxt, cl);
-		}
-	}
+        for (i = 0; y<ye; i++)
+        {
+            y = y + 1;
+            if (py <= 0)
+                py = py + 2 * dx1;
+            else
+            {
+                if ((dx<0 && dy<0) || (dx>0 && dy>0)) x = x + 1; else x = x - 1;
+                py = py + 2 * (dx1 - dy1);
+            }
+            draw(x, y, pxt, cl);
+        }
+    }
 }
 
 void Instance::drawTriangle(int x1, int y1, int x2, int y2, int x3, int y3)

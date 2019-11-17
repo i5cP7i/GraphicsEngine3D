@@ -4,6 +4,8 @@
 
 class Polygon3D
 {
+public:
+
 protected:
 	struct vertex
 	{
@@ -24,7 +26,7 @@ protected:
 		float m[4][4] = { 0 };
 	};
 	virtual void CreateMesh() = 0;
-	//void setProjectionMatrix(mat4x4 &matrix, float fZn, float fZf, float fFOV, float fAspectRatio, float fFOVRad);
+
 	
 public:
 	void MatrixMultiplier(vertex &i, vertex &o, mat4x4 &m)
