@@ -4,12 +4,12 @@
 class Initialize
 {
 public:
-	Initialize();
-	~Initialize();
+    Initialize();
+    ~Initialize();
 public:
-	void initInstance(Instance * newInstance, uint8_t ID);
-	std::vector<Instance *> getInstance() const;
+    void initInstance(Instance * newInstance, uint8_t ID);
+    std::vector<Instance *> getInstance() const;
 private:
-	std::vector<Instance *> instances;
+    std::vector<Instance *> instances;
 };
 
