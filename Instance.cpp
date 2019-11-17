@@ -1,11 +1,10 @@
 #include "Instance.h"
-#include "GraphicsEngine3D.h"
 
 std::atomic<bool> Instance::bAtomicActive;
 std::condition_variable Instance::EngineFinished;
 std::mutex Instance::muxEngine;
 
-Instance::Instance(unsigned char instance) : GraphicsEngine3D (instance)
+Instance::Instance(unsigned char id) : GraphicsEngine3D (id)
 {
 	c_ScreenWidth = 320;
 	c_ScreenHeight = 180;
@@ -19,9 +18,7 @@ Instance::Instance(unsigned char instance) : GraphicsEngine3D (instance)
 
 Instance::~Instance()
 {
-	delete[] c_ScreenBuffer;
-	SetConsoleActiveScreenBuffer(c_OriginalConsole);
-	EngineFinished.notify_one();
+
 }
 
 int Instance::CreateConsoleWindow(int width, int height, int fontSizeX, int fontSizeY)
@@ -58,26 +55,32 @@ int Instance::CreateConsoleWindow(int width, int height, int fontSizeX, int font
 	//TODO: ERROR CODE
 
 	//Set physical console window size
-	c_rectWindow = { 0, 0, static_cast<short>(c_ScreenWidth) - 1, static_cast<short>(c_ScreenHeight) - 1};
+	c_rectWindow = { 0, 0, static_cast<short>(c_ScreenWidth) - 1, static_cast<short>(c_ScreenHeight) - 1 };
 	SetConsoleWindowInfo(c_ConsoleOut, TRUE, &c_rectWindow);
 
 	//Allocate memory for screen buffer
 	c_ScreenBuffer = new CHAR_INFO[c_ScreenWidth * c_ScreenHeight];
 	memset(c_ScreenBuffer, 0, sizeof(CHAR_INFO) * c_ScreenWidth * c_ScreenHeight);
 	//Mouse Input
+	GetConsoleCursorInfo(c_ConsoleOut, &c_ConsoleCursorInfo);
+	c_ConsoleCursorInfo.bVisible = false;
+	SetConsoleCursorInfo(c_ConsoleOut, &c_ConsoleCursorInfo);
 	SetConsoleMode(c_ConsoleIn, ENABLE_EXTENDED_FLAGS | ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT);
 
 	SetConsoleCtrlHandler((PHANDLER_ROUTINE)CloseHandler, TRUE);
 	return 1;
 }
 
+// Create
 bool Instance::EngineCreate()
 {
 	return true;
 }
 
+// Update the screen
 bool Instance::EngineUpdate(float fElapsedTime)
 {
+	Fill(0, 0, getConsoleWindowWidth(), getConsoleWindowHeight(), PIXEL_SOLID, FG_BLACK);
 	return true;
 }
 
@@ -107,7 +110,7 @@ int Instance::getConsoleWindowHeight() const
 	return c_ScreenHeight;
 }
 
-void Instance::StartThread(Instance &i) const 
+void Instance::StartThread(Instance &i)
 {
 	bAtomicActive = true;
 	std::thread t = std::thread(&Instance::InstanceThread, i);
@@ -142,8 +145,138 @@ void Instance::InstanceThread()
 	}
 }
 
+
 int Instance::ErrMsg(const wchar_t * msg)
-{
+{	
 	//TODO
 	return 0;
+}
+
+void Instance::drawLine(int x1, int x2, int y1, int y2)
+{
+	drawLine(x1, x2, y1, y2, GraphicsEngine3D::PIXEL_TYPE::PIXEL_SOLID, GraphicsEngine3D::COLOR::FG_WHITE);
+}
+
+void Instance::drawLine(int x1, int x2, int y1, int y2, GraphicsEngine3D::PIXEL_TYPE pxt, GraphicsEngine3D::COLOR cl)
+{
+	int x, y, dx, dy, dx1, dy1, px, py, xe, ye, i;
+	dx = x2 - x1; dy = y2 - y1;
+	dx1 = abs(dx); dy1 = abs(dy);
+	px = 2 * dy1 - dx1;	py = 2 * dx1 - dy1;
+	if (dy1 <= dx1)
+	{
+		if (dx >= 0)
+		{
+			x = x1; y = y1; xe = x2;
+		}
+		else
+		{
+			x = x2; y = y2; xe = x1;
+		}
+
+		draw(x, y, pxt, cl);
+
+		for (i = 0; x<xe; i++)
+		{
+			x = x + 1;
+			if (px<0)
+				px = px + 2 * dy1;
+			else
+			{
+				if ((dx<0 && dy<0) || (dx>0 && dy>0)) y = y + 1; else y = y - 1;
+				px = px + 2 * (dy1 - dx1);
+			}
+			draw(x, y, pxt, cl);
+		}
+	}
+	else
+	{
+		if (dy >= 0)
+		{
+			x = x1; y = y1; ye = y2;
+		}
+		else
+		{
+			x = x2; y = y2; ye = y1;
+		}
+
+		draw(x, y, pxt, cl);
+
+		for (i = 0; y<ye; i++)
+		{
+			y = y + 1;
+			if (py <= 0)
+				py = py + 2 * dx1;
+			else
+			{
+				if ((dx<0 && dy<0) || (dx>0 && dy>0)) x = x + 1; else x = x - 1;
+				py = py + 2 * (dx1 - dy1);
+			}
+			draw(x, y, pxt, cl);
+		}
+	}
+}
+
+void Instance::drawTriangle(int x1, int y1, int x2, int y2, int x3, int y3)
+{
+	drawTriangle(x1, y1, x2, y2, x3, y3, GraphicsEngine3D::PIXEL_TYPE::PIXEL_SOLID, GraphicsEngine3D::COLOR::FG_WHITE);
+}
+
+void Instance::drawTriangle(int x1, int y1, int x2, int y2, int x3, int y3, GraphicsEngine3D::PIXEL_TYPE pxt, GraphicsEngine3D::COLOR cl)
+{
+	drawLine(x1, y1, x2, y2, pxt, cl);
+	drawLine(x2, y2, x3, y3, pxt, cl);
+	drawLine(x3, y3, x1, y1, pxt, cl);
+}
+
+void Instance::drawCircle()
+{
+}
+
+void Instance::draw(int x, int y)
+{
+	draw(x, y, GraphicsEngine3D::PIXEL_TYPE::PIXEL_SOLID, GraphicsEngine3D::COLOR::FG_WHITE);
+}
+
+void Instance::draw(int x, int y, GraphicsEngine3D::PIXEL_TYPE pxt, GraphicsEngine3D::COLOR cl)
+{
+	if ((x >= 0 && x < c_ScreenWidth) && (y >= 0 && y < c_ScreenHeight))
+	{
+		c_ScreenBuffer[y * getConsoleWindowWidth() + x].Char.UnicodeChar = pxt;
+		c_ScreenBuffer[y * getConsoleWindowWidth() + x].Attributes = cl;
+	}
+}
+
+void Instance::Fill(int x1, int y1, int x2, int y2)
+{
+	Fill(x1, y1, x2, y2, GraphicsEngine3D::PIXEL_TYPE::PIXEL_SOLID, GraphicsEngine3D::COLOR::FG_WHITE);
+}
+
+void Instance::Fill(int x1, int y1, int x2, int y2, GraphicsEngine3D::PIXEL_TYPE pxt, GraphicsEngine3D::COLOR cl)
+{
+	Clip(x1, y1);
+	Clip(x2, y2);
+	for (int x = x1; x < x2; x++)
+		for (int y = y1; y < y2; y++)
+			draw(x, y, pxt, cl);
+}
+
+void Instance::Clip(int & x, int & y)
+{
+	if (x < 0)
+	{
+		x = 0;
+	}
+	if (x >= getConsoleWindowWidth())
+	{
+		x = getConsoleWindowWidth();
+	}
+	if (y < 0)
+	{
+		y = 0;
+	}
+	if (y >= getConsoleWindowHeight())
+	{
+		y = getConsoleWindowHeight();
+	}
 }
