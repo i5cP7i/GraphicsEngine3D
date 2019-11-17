@@ -1,8 +1,12 @@
 #include "Cube.h"
 #include "math.h"
 
-Cube::Cube()
+Cube::Cube(float fSideLength, float fOriginX, float fOriginY, float fOriginZ)
 {
+    this->fSideLength = fSideLength;
+    this->fOriginX = fOriginX;
+    this->fOriginY = fOriginY;
+    this->fOriginZ = fOriginZ;
     CreateMesh();
 }
 
@@ -76,29 +80,29 @@ void Cube::CreateMesh()
 {
     meshCube.tri = {
 
-        // SOUTH
-        { 0.0f, 0.0f, 0.0f,    0.0f, 1.0f, 0.0f,    1.0f, 1.0f, 0.0f },
-        { 0.0f, 0.0f, 0.0f,    1.0f, 1.0f, 0.0f,    1.0f, 0.0f, 0.0f },
+        // FRONT
+        { 0.0f-fOriginX, 0.0f-fOriginY,0.0f-fOriginZ,   0.0f-fOriginX, fSideLength, 0.0f-fOriginZ,    fSideLength, fSideLength, 0.0f-fOriginZ },
+        { 0.0f-fOriginX, 0.0f-fOriginY, 0.0f-fOriginZ,    fSideLength, fSideLength, 0.0f-fOriginZ,    fSideLength, 0.0f-fOriginY, 0.0f-fOriginZ },
 
-        // EAST
-        { 1.0f, 0.0f, 0.0f,    1.0f, 1.0f, 0.0f,    1.0f, 1.0f, 1.0f },
-        { 1.0f, 0.0f, 0.0f,    1.0f, 1.0f, 1.0f,    1.0f, 0.0f, 1.0f },
+        // LEFT
+        { fSideLength, 0.0f-fOriginY, 0.0f-fOriginZ,   fSideLength, fSideLength, 0.0f-fOriginZ,    fSideLength, fSideLength, fSideLength },
+        { fSideLength, 0.0f-fOriginY, 0.0f-fOriginZ,    fSideLength, fSideLength, fSideLength,    fSideLength, 0.0f-fOriginY, fSideLength },
 
-        // NORTH
-        { 1.0f, 0.0f, 1.0f,    1.0f, 1.0f, 1.0f,    0.0f, 1.0f, 1.0f },
-        { 1.0f, 0.0f, 1.0f,    0.0f, 1.0f, 1.0f,    0.0f, 0.0f, 1.0f },
+        // BACK
+        { fSideLength, 0.0f-fOriginY, fSideLength,    fSideLength, fSideLength, fSideLength,    0.0f-fOriginX, fSideLength, fSideLength },
+        { fSideLength, 0.0f-fOriginY, fSideLength,    0.0f-fOriginX, fSideLength, fSideLength,    0.0f-fOriginX, 0.0f-fOriginY, fSideLength },
 
-        // WEST
-        { 0.0f, 0.0f, 1.0f,    0.0f, 1.0f, 1.0f,    0.0f, 1.0f, 0.0f },
-        { 0.0f, 0.0f, 1.0f,    0.0f, 1.0f, 0.0f,    0.0f, 0.0f, 0.0f },
+        // RIGHT
+        { 0.0f-fOriginX, 0.0f-fOriginY, fSideLength,    0.0f-fOriginX, fSideLength, fSideLength,    0.0f-fOriginX, fSideLength, 0.0f-fOriginZ },
+        { 0.0f-fOriginX, 0.0f-fOriginY, fSideLength,    0.0f-fOriginX, fSideLength, 0.0f-fOriginZ,    0.0f-fOriginX, 0.0f-fOriginY, 0.0f-fOriginZ },
 
         // TOP
-        { 0.0f, 1.0f, 0.0f,    0.0f, 1.0f, 1.0f,    1.0f, 1.0f, 1.0f },
-        { 0.0f, 1.0f, 0.0f,    1.0f, 1.0f, 1.0f,    1.0f, 1.0f, 0.0f },
+        { 0.0f-fOriginX, fSideLength, 0.0f-fOriginZ,    0.0f-fOriginX, fSideLength, fSideLength,    fSideLength, fSideLength, fSideLength },
+        { 0.0f-fOriginX, fSideLength, 0.0f-fOriginZ,    fSideLength, fSideLength, fSideLength,    fSideLength, fSideLength, 0.0f-fOriginZ },
 
         // BOTTOM
-        { 1.0f, 0.0f, 1.0f,    0.0f, 0.0f, 1.0f,    0.0f, 0.0f, 0.0f },
-        { 1.0f, 0.0f, 1.0f,    0.0f, 0.0f, 0.0f,    1.0f, 0.0f, 0.0f }
+        { fSideLength, 0.0f-fOriginY, fSideLength,    0.0f-fOriginX, 0.0f-fOriginY, fSideLength,   0.0f-fOriginX, 0.0f-fOriginY, 0.0f-fOriginZ },
+        { fSideLength, 0.0f-fOriginY, fSideLength,   0.0f-fOriginX, 0.0f-fOriginY, 0.0f-fOriginZ,    fSideLength, 0.0f-fOriginY, 0.0f-fOriginZ }
 
     };
 }
