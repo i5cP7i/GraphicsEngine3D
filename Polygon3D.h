@@ -13,6 +13,13 @@ protected:
         float y;
         float z;
     };
+    struct vector
+    {
+        vertex p[2];
+        float xi;
+        float yj;
+        float zk;
+    };
     struct triangle
     {
         vertex p[3];
@@ -41,5 +48,66 @@ public:
             o.x /= w; o.y /= w; o.z /= w;
         }
     }
+    vector getNormalVector(vector &u, vector &v)
+    {
+        vector w;
+        w.p[0].x = u.p[0].x;
+        w.p[0].y = u.p[0].y;
+        w.p[0].z = u.p[0].z;
 
+        CalcDeterminant(u, v, w.xi, w.yj, w.zk);
+        w.xi = ((u.yj * v.zk) - (u.zk * v.yj));
+        w.yj = -((u.xi * v.zk) - (u.zk * v.xi));
+        w.zk = ((u.xi * v.yj) - (u.yj * v.xi));
+
+        w.p[1].x = w.xi;
+        w.p[1].y = w.yj;
+        w.p[1].z = w.zk;
+        return w;
+    }
+
+    float
+    getVectorMagnitude(vector &u)
+    {
+        float x = u.p[1].x-u.p[0].x;
+        float y = u.p[1].y-u.p[0].y;
+        float z = u.p[1].z-u.p[0].z;
+        return sqrtf(x*x + y*y + z*z);
+    }
+
+    float
+    getVectorMagnitude(float x1, float y1, float z1, float x0, float y0, float z0)
+    {
+        float x = x1-x0;
+        float y = y1-y0;
+        float z = z1-z0;
+        return sqrtf(x*x + y*y + z*z);
+    }
+
+    void
+    CalcDeterminant(float u1, float u2, float u3, float v1, float v2, float v3, float &xi, float &yj, float &zk)
+    {
+        xi = ((u2 * v3) - (u3 * v2));
+        yj = -((u1 * v3) - (u3 * v1));
+        zk = ((u1 * v2) - (u2 * v1));
+    }
+
+    void
+    CalcDeterminant(vector u, vector v, float &xi, float &yj, float &zk)
+    {
+        xi = ((u.yj * v.zk) - (u.zk * v.yj));
+        yj = -((u.xi * v.zk) - (u.zk * v.xi));
+        zk = ((u.xi * v.yj) - (u.yj * v.xi));
+    }
+
+    float
+    fCalcDotProduct(float u1, float u2, float u3, float v1, float v2, float v3)
+    {
+        return u1*v1 + u2*v2 + u3*v3;;
+    }
+    float
+    fCalcDotProduct(vector u, vector v)
+    {
+        return u.xi*v.xi + u.yj*v.yj + u.zk*v.zk;
+    }
 };

@@ -7,6 +7,7 @@
 
 #include <windows.h>
 
+#include "math.h"
 #include <iostream>
 #include <chrono>
 #include <vector>

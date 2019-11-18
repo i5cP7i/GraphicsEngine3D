@@ -1,7 +1,6 @@
 #include "Instance.h"
 #include "Initialize.h"
 #include "Cube.h"
-#include "math.h"
 
 std::atomic<bool> Instance::bAtomicActive;
 std::condition_variable Instance::EngineFinished;
@@ -19,7 +18,7 @@ Instance::Instance(unsigned char id) : GraphicsEngine3D (id)
 }
 Instance::~Instance()
 {
-    delete cube;
+    //delete cube;
     delete c_ScreenBuffer;
     SetConsoleActiveScreenBuffer(c_OriginalConsole);
     EngineFinished.notify_one();
