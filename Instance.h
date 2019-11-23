@@ -1,8 +1,8 @@
 #pragma once
 #include "GraphicsEngine3D.h"
-#include "Cube.h"
 
 class Cube;
+class Object3D;
 class Instance :
     public GraphicsEngine3D
 {
@@ -58,4 +58,5 @@ private:
     static std::mutex muxEngine;
 private:
     Cube * cube;
+    Object3D * object3d;
 };

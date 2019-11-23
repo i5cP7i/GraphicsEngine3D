@@ -1,6 +1,7 @@
 #include "Instance.h"
 #include "Initialize.h"
 #include "Cube.h"
+#include "Object3D.h"
 
 std::atomic<bool> Instance::bAtomicActive;
 std::condition_variable Instance::EngineFinished;
@@ -18,7 +19,6 @@ Instance::Instance(unsigned char id) : GraphicsEngine3D (id)
 }
 Instance::~Instance()
 {
-    //delete cube;
     delete c_ScreenBuffer;
     SetConsoleActiveScreenBuffer(c_OriginalConsole);
     EngineFinished.notify_one();
@@ -76,8 +76,10 @@ int Instance::CreateConsoleWindow(int width, int height, int fontSizeX, int font
 // Create objects
 bool Instance::EngineCreate()
 {
-    cube = new Cube(1.0f, 0.0f, 0.0f, 0.0f);
-    cube->setProjectionMatrix(this, 0.1f, 1000.0f, 90.0f);
+    //cube = new Cube(0.5f, -1.0f, -1.0f, -1.0f);
+    //cube->setProjectionMatrix(this, 0.1f, 1000.0f, 90.0f);
+    object3d = new Object3D("C:/Users/11703088/OneDrive - PXL/Electronic_Engineering/EAI2/C++/Individual_project/GraphicsEngine3D/GraphicsEngine3D/Pyramid.obj");
+    object3d->setProjectionMatrix(this, 0.1f, 1000.0f, 90.0f);
     return true;
 }
 
@@ -86,7 +88,7 @@ bool Instance::EngineUpdate(float fElapsedTime)
 {
     Fill(0, 0, getConsoleWindowWidth(), getConsoleWindowHeight(), PIXEL_SOLID, FG_BLACK);
     // Engine code goes here
-    cube->demoCube(this);
+    object3d->demoCustomObject(this);
     return true;
 }
 

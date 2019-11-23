@@ -1,22 +1,23 @@
 #pragma once
 #include "Polygon3D.h"
+#include <fstream>
+#include <strstream>
 
 class Instance;
 
-class Cube :
+class Object3D :
     public Polygon3D
 {
 public:
-    Cube(float fSideLength, float fOriginX, float fOriginY, float fOriginZ);
-    virtual ~Cube();
+    Object3D(std::string ifName);
+    virtual ~Object3D();
 public:
-    void demoCube(Instance*);
     void setProjectionMatrix(Instance *i, float fZn, float fZf, float fFOV);
-    void setDrawingMode();
+    void demoCustomObject(Instance*);
 protected:
-    void CreateMesh() override;
+   virtual void CreateMesh();
 private:
-    mesh meshCube;
+    mesh meshObject;
     mat4x4 matProj, matRotZ, matRotX;
     vector tempVec1;
     vector tempVec2;
@@ -34,4 +35,9 @@ private:
     float fOriginX;
     float fOriginY;
     float fOriginZ;
+
+    bool LoadObjectFile(std::string ifName);
+    std::vector<vertex> vertices;
+    std::string ifName;
 };
+

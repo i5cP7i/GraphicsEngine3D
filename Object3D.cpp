@@ -1,20 +1,30 @@
-#include "Cube.h"
+#include "Object3D.h"
 
-Cube::Cube(float fSideLength, float fOriginX, float fOriginY, float fOriginZ)
+Object3D::Object3D(std::string ifName)
 {
-    this->fSideLength = fSideLength;
-    this->fOriginX = fOriginX;
-    this->fOriginY = fOriginY;
-    this->fOriginZ = fOriginZ;
+    this->ifName = ifName;
     CreateMesh();
 }
 
-Cube::~Cube()
+Object3D::~Object3D()
 {
 
 }
 
-void Cube::demoCube(Instance* i)
+void Object3D::setProjectionMatrix(Instance *i, float fZn, float fZf, float fFOV)
+{
+    this->fAspectRatio = static_cast<float>(i->getConsoleWindowHeight()) / static_cast<float>(i->getConsoleWindowWidth());
+    this->fFOVRad = 1.0f / tanf(fFOV * 0.5f / 180.0f * 3.14159f);
+
+    matProj.m[0][0] = fAspectRatio * fFOVRad;
+    matProj.m[1][1] = fFOVRad;
+    matProj.m[2][2] = 1.0f / (1.0f - fZn / fZf);
+    matProj.m[2][3] = 1.0f;
+    matProj.m[3][2] = -(fZn) / (1.0f - fZn / fZf);
+    matProj.m[3][3] = 0.0f;
+}
+
+void Object3D::demoCustomObject(Instance *i)
 {
     fTheta += 1.0f * i->fElapsedTime;
     //Rotation z
@@ -34,7 +44,7 @@ void Cube::demoCube(Instance* i)
     matRotX.m[3][3] = 1.0f;
 
     //Draw triangles
-    for (auto tri : meshCube.tri)
+    for (auto tri : meshObject.tri)
     {
         triangle triProjected, triTrans, triRotZ, triRotZX;
 
@@ -50,9 +60,9 @@ void Cube::demoCube(Instance* i)
 
         //Translate tris
         triTrans = triRotZX;
-        triTrans.p[0].z = triRotZX.p[0].z + 5.0f;
-        triTrans.p[1].z = triRotZX.p[1].z + 5.0f;
-        triTrans.p[2].z = triRotZX.p[2].z + 5.0f;
+        triTrans.p[0].z = triRotZX.p[0].z + 4.0f;
+        triTrans.p[1].z = triRotZX.p[1].z + 4.0f;
+        triTrans.p[2].z = triRotZX.p[2].z + 4.0f;
 
         tempVec1.p[0].x = triTrans.p[0].x;
         tempVec1.p[1].x = triTrans.p[1].x;
@@ -113,45 +123,41 @@ void Cube::demoCube(Instance* i)
     }
 }
 
-void Cube::CreateMesh()
+void Object3D::CreateMesh()
 {
-    meshCube.tri = {
-
-        // FRONT
-        { 0.0f-fOriginX, 0.0f-fOriginY,0.0f-fOriginZ,   0.0f-fOriginX, fSideLength, 0.0f-fOriginZ,    fSideLength, fSideLength, 0.0f-fOriginZ },
-        { 0.0f-fOriginX, 0.0f-fOriginY, 0.0f-fOriginZ,    fSideLength, fSideLength, 0.0f-fOriginZ,    fSideLength, 0.0f-fOriginY, 0.0f-fOriginZ },
-
-        // LEFT
-        { fSideLength, 0.0f-fOriginY, 0.0f-fOriginZ,   fSideLength, fSideLength, 0.0f-fOriginZ,    fSideLength, fSideLength, fSideLength },
-        { fSideLength, 0.0f-fOriginY, 0.0f-fOriginZ,    fSideLength, fSideLength, fSideLength,    fSideLength, 0.0f-fOriginY, fSideLength },
-
-        // BACK
-        { fSideLength, 0.0f-fOriginY, fSideLength,    fSideLength, fSideLength, fSideLength,    0.0f-fOriginX, fSideLength, fSideLength },
-        { fSideLength, 0.0f-fOriginY, fSideLength,    0.0f-fOriginX, fSideLength, fSideLength,    0.0f-fOriginX, 0.0f-fOriginY, fSideLength },
-
-        // RIGHT
-        { 0.0f-fOriginX, 0.0f-fOriginY, fSideLength,    0.0f-fOriginX, fSideLength, fSideLength,    0.0f-fOriginX, fSideLength, 0.0f-fOriginZ },
-        { 0.0f-fOriginX, 0.0f-fOriginY, fSideLength,    0.0f-fOriginX, fSideLength, 0.0f-fOriginZ,    0.0f-fOriginX, 0.0f-fOriginY, 0.0f-fOriginZ },
-
-        // TOP
-        { 0.0f-fOriginX, fSideLength, 0.0f-fOriginZ,    0.0f-fOriginX, fSideLength, fSideLength,    fSideLength, fSideLength, fSideLength },
-        { 0.0f-fOriginX, fSideLength, 0.0f-fOriginZ,    fSideLength, fSideLength, fSideLength,    fSideLength, fSideLength, 0.0f-fOriginZ },
-
-        // BOTTOM
-        { fSideLength, 0.0f-fOriginY, fSideLength,    0.0f-fOriginX, 0.0f-fOriginY, fSideLength,   0.0f-fOriginX, 0.0f-fOriginY, 0.0f-fOriginZ },
-        { fSideLength, 0.0f-fOriginY, fSideLength,   0.0f-fOriginX, 0.0f-fOriginY, 0.0f-fOriginZ,    fSideLength, 0.0f-fOriginY, 0.0f-fOriginZ }
-
-    };
+    LoadObjectFile(this->ifName);
 }
-void Cube::setProjectionMatrix(Instance *i, float fZn, float fZf, float fFOV)
-{
-    this->fAspectRatio = static_cast<float>(i->getConsoleWindowHeight()) / static_cast<float>(i->getConsoleWindowWidth());
-    this->fFOVRad = 1.0f / tanf(fFOV * 0.5f / 180.0f * 3.14159f);
 
-    matProj.m[0][0] = fAspectRatio * fFOVRad;
-    matProj.m[1][1] = fFOVRad;
-    matProj.m[2][2] = 1.0f / (1.0f - fZn / fZf);
-    matProj.m[2][3] = 1.0f;
-    matProj.m[3][2] = -(fZn) / (1.0f - fZn / fZf);
-    matProj.m[3][3] = 0.0f;
+bool Object3D::LoadObjectFile(std::string ifName)
+{
+    std::ifstream f(ifName);
+    std::ifstream in(ifName, std::ios::binary);
+    if (!f.is_open())
+        return false;
+
+    while(!f.eof())
+    {
+        char line[128];
+        f.getline(line, 128);
+
+        std::strstream strs;
+        strs << line;
+
+        char token;
+
+        if (line[0] == 'v')
+        {
+            vertex v;
+            strs >> token >> v.x >> v.y >> v.z;
+            vertices.push_back(v);
+        }
+
+        if (line[0] == 'f')
+        {
+            int f[3];
+            strs >> token >> f[0] >> f[1] >> f[2];
+            meshObject.tri.push_back({vertices[f[0] - 1], vertices[f[1] - 1], vertices[f[2] - 1]});
+        }
+    }
+    return true;
 }
