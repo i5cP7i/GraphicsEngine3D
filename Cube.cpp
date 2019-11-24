@@ -50,9 +50,9 @@ void Cube::demoCube(Instance* i)
 
         //Translate tris
         triTrans = triRotZX;
-        triTrans.p[0].z = triRotZX.p[0].z + 5.0f;
-        triTrans.p[1].z = triRotZX.p[1].z + 5.0f;
-        triTrans.p[2].z = triRotZX.p[2].z + 5.0f;
+        triTrans.p[0].z = triRotZX.p[0].z + 3.0f;
+        triTrans.p[1].z = triRotZX.p[1].z + 3.0f;
+        triTrans.p[2].z = triRotZX.p[2].z + 3.0f;
 
         tempVec1.p[0].x = triTrans.p[0].x;
         tempVec1.p[1].x = triTrans.p[1].x;
@@ -105,10 +105,15 @@ void Cube::demoCube(Instance* i)
             triProjected.p[2].x *= 0.5f * static_cast<float>(i->getConsoleWindowWidth());
             triProjected.p[2].y *= 0.5f * static_cast<float>(i->getConsoleWindowHeight());
 
-            i->drawTriangle(triProjected.p[0].x, triProjected.p[0].y,
+            i->FillTriangle(i, triProjected.p[0].x, triProjected.p[0].y,
                 triProjected.p[1].x, triProjected.p[1].y,
                 triProjected.p[2].x, triProjected.p[2].y,
                 i->PIXEL_SOLID, i->FG_WHITE);
+
+            i->drawTriangle(triProjected.p[0].x, triProjected.p[0].y,
+                triProjected.p[1].x, triProjected.p[1].y,
+                triProjected.p[2].x, triProjected.p[2].y,
+                i->PIXEL_SOLID, i->FG_BLACK);
         }
     }
 }
