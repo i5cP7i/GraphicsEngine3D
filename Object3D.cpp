@@ -159,10 +159,7 @@ void Object3D::demoCustomObject(Instance *i)
             triProjected.p[1].x, triProjected.p[1].y,
             triProjected.p[2].x, triProjected.p[2].y,
             static_cast<GraphicsEngine3D::PIXEL_TYPE>(triProjected.pxt), static_cast<GraphicsEngine3D::COLOR>(triProjected.cl));
-        i->FillTriangle(i, triProjected.p[0].x, triProjected.p[0].y,
-            triProjected.p[1].x, triProjected.p[1].y,
-            triProjected.p[2].x, triProjected.p[2].y,
-            i->PIXEL_SOLID, i->FG_WHITE);
+
         i->drawTriangle(triProjected.p[0].x, triProjected.p[0].y,
             triProjected.p[1].x, triProjected.p[1].y,
             triProjected.p[2].x, triProjected.p[2].y,

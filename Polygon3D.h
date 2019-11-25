@@ -56,9 +56,6 @@ public:
         w.p[0].z = u.p[0].z;
 
         CalcDeterminant(u, v, w.xi, w.yj, w.zk);
-        w.xi = ((u.yj * v.zk) - (u.zk * v.yj));
-        w.yj = -((u.xi * v.zk) - (u.zk * v.xi));
-        w.zk = ((u.xi * v.yj) - (u.yj * v.xi));
 
         w.p[1].x = w.xi;
         w.p[1].y = w.yj;

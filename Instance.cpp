@@ -88,7 +88,7 @@ bool Instance::EngineCreate()
 // Update the screen
 bool Instance::EngineUpdate(float fElapsedTime)
 {
-    Fill(0, 0, getConsoleWindowWidth(), getConsoleWindowHeight(), PIXEL_SOLID, FG_BLACK);
+    Fill(0, 0, getConsoleWindowWidth(), getConsoleWindowHeight(), PIXEL_SOLID, FG_BLUE);
     // Engine code goes here
     //object3d->demoCustomObject(this);
     cube->demoCube(this);
