@@ -3,6 +3,7 @@
 #include "Cube.h"
 #include "Object3D.h"
 
+//statics
 std::atomic<bool> Instance::bAtomicActive;
 std::condition_variable Instance::EngineFinished;
 std::mutex Instance::muxEngine;
@@ -377,6 +378,40 @@ next:
         if (y>y3) return;
     }
 }
+
+CHAR_INFO Instance::getColorFromLux(float lux)
+{
+        uint16_t bg_col, fg_col;
+        float multiplier = 27.0f;
+        wchar_t sym;
+        int pixel_bw = (int)(multiplier*lux);
+        switch (pixel_bw)
+        {
+        case 0: bg_col = BG_BLACK; fg_col = FG_BLACK; sym = PIXEL_SOLID; break;
+
+        case 1: bg_col = BG_BLACK; fg_col = FG_DARK_GRAY; sym = PIXEL_QUARTER; break;
+        case 2: bg_col = BG_BLACK; fg_col = FG_DARK_GRAY; sym = PIXEL_HALF; break;
+        case 3: bg_col = BG_BLACK; fg_col = FG_DARK_GRAY; sym = PIXEL_THREEQUARTERS; break;
+        case 4: bg_col = BG_BLACK; fg_col = FG_DARK_GRAY; sym = PIXEL_SOLID; break;
+
+        case 5: bg_col = BG_DARK_GRAY; fg_col = FG_GRAY; sym = PIXEL_QUARTER; break;
+        case 6: bg_col = BG_DARK_GRAY; fg_col = FG_GRAY; sym = PIXEL_HALF; break;
+        case 7: bg_col = BG_DARK_GRAY; fg_col = FG_GRAY; sym = PIXEL_THREEQUARTERS; break;
+        case 8: bg_col = BG_DARK_GRAY; fg_col = FG_GRAY; sym = PIXEL_SOLID; break;
+
+        case 9:  bg_col = BG_GRAY; fg_col = FG_WHITE; sym = PIXEL_QUARTER; break;
+        case 10: bg_col = BG_GRAY; fg_col = FG_WHITE; sym = PIXEL_HALF; break;
+        case 11: bg_col = BG_GRAY; fg_col = FG_WHITE; sym = PIXEL_THREEQUARTERS; break;
+        case 12: bg_col = BG_GRAY; fg_col = FG_WHITE; sym = PIXEL_SOLID; break;
+        default:
+            bg_col = BG_BLACK; fg_col = FG_BLACK; sym = PIXEL_SOLID;
+        }
+
+        CHAR_INFO c;
+        c.Attributes = bg_col | fg_col;
+        c.Char.UnicodeChar = sym;
+        return c;
+    }
 
 void Instance::drawCircle()
 {

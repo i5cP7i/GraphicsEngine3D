@@ -34,6 +34,10 @@ public:
 
     void FillTriangle(Instance*, int x1, int y1, int x2, int y2, int x3, int y3);
     void FillTriangle(Instance*, int x1, int y1, int x2, int y2, int x3, int y3, GraphicsEngine3D::PIXEL_TYPE, GraphicsEngine3D::COLOR);
+
+    //Lighting
+    CHAR_INFO getColorFromLux(float lux);
+
     float fElapsedTime;
 protected:
     [[nodiscard]]const std::wstring getConsoleAppName() const noexcept override;

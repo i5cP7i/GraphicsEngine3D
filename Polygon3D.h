@@ -22,6 +22,8 @@ protected:
     struct triangle
     {
         vertex p[3];
+        uint16_t pxt;
+        uint16_t cl;
     };
     struct mesh
     {

@@ -1,4 +1,5 @@
 #include "Object3D.h"
+#include <algorithm>
 
 Object3D::Object3D(std::string ifName)
 {
@@ -43,6 +44,8 @@ void Object3D::demoCustomObject(Instance *i)
     matRotX.m[2][2] = cosf(fTheta * 0.5f);
     matRotX.m[3][3] = 1.0f;
 
+    std::vector<triangle> storeTrisToRaster;
+
     //Draw triangles
     for (auto tri : meshObject.tri)
     {
@@ -60,9 +63,9 @@ void Object3D::demoCustomObject(Instance *i)
 
         //Translate tris
         triTrans = triRotZX;
-        triTrans.p[0].z = triRotZX.p[0].z + 4.0f;
-        triTrans.p[1].z = triRotZX.p[1].z + 4.0f;
-        triTrans.p[2].z = triRotZX.p[2].z + 4.0f;
+        triTrans.p[0].z = triRotZX.p[0].z + 3.0f;
+        triTrans.p[1].z = triRotZX.p[1].z + 3.0f;
+        triTrans.p[2].z = triRotZX.p[2].z + 3.0f;
 
         tempVec1.p[0].x = triTrans.p[0].x;
         tempVec1.p[1].x = triTrans.p[1].x;
@@ -98,10 +101,34 @@ void Object3D::demoCustomObject(Instance *i)
                             triTrans.p[0].y - vCamera.yj,
                             triTrans.p[0].z - vCamera.zk)  < 0.0f)
         {
+            //Single direction lighting
+            vector lightDirection;
+            lightDirection.p[0].x = 0.0f;
+            lightDirection.p[0].y = 0.0f;
+            lightDirection.p[0].z = 0.0f;
+            lightDirection.p[1].x = 0.0f;
+            lightDirection.p[1].y = 0.0f;
+            lightDirection.p[1].z = -1.0f;
+            lightDirection.xi = 0.0f;
+            lightDirection.yj = 0.0f;
+            lightDirection.zk = -1.0f;
+            float l = getVectorMagnitude(lightDirection);
+            lightDirection.xi /= l;
+            lightDirection.yj /= l;
+            lightDirection.zk /= l;
+
+            float normalizationLightDirection = fCalcDotProduct(normal, lightDirection);
+
+            CHAR_INFO c = i->getColorFromLux(normalizationLightDirection);
+            triTrans.cl = c.Attributes;
+            triTrans.pxt = c.Char.UnicodeChar;
+
             //Projection Matrix
             MatrixMultiplier(triTrans.p[0], triProjected.p[0], matProj);
             MatrixMultiplier(triTrans.p[1], triProjected.p[1], matProj);
             MatrixMultiplier(triTrans.p[2], triProjected.p[2], matProj);
+            triProjected.cl = triTrans.cl;
+            triProjected.pxt = triTrans.pxt;
 
             //scale
             triProjected.p[0].x += 1.0f; triProjected.p[0].y += 1.0f;
@@ -115,11 +142,31 @@ void Object3D::demoCustomObject(Instance *i)
             triProjected.p[2].x *= 0.5f * static_cast<float>(i->getConsoleWindowWidth());
             triProjected.p[2].y *= 0.5f * static_cast<float>(i->getConsoleWindowHeight());
 
-            i->drawTriangle(triProjected.p[0].x, triProjected.p[0].y,
-                triProjected.p[1].x, triProjected.p[1].y,
-                triProjected.p[2].x, triProjected.p[2].y,
-                i->PIXEL_SOLID, i->FG_WHITE);
+            // Store
+            storeTrisToRaster.push_back(triProjected);
         }
+    }
+    // Sort
+    std::sort(storeTrisToRaster.begin(), storeTrisToRaster.end(), [](triangle &t1, triangle &t2)
+    {
+        float z1 = (t1.p[0].z + t1.p[1].z + t1.p[2].z) / 3.0f;
+        float z2 = (t2.p[0].z + t2.p[1].z + t2.p[2].z) / 3.0f;
+        return z1 > z2;
+    });
+    for (auto &triProjected : storeTrisToRaster)
+    {
+        i->FillTriangle(i, triProjected.p[0].x, triProjected.p[0].y,
+            triProjected.p[1].x, triProjected.p[1].y,
+            triProjected.p[2].x, triProjected.p[2].y,
+            static_cast<GraphicsEngine3D::PIXEL_TYPE>(triProjected.pxt), static_cast<GraphicsEngine3D::COLOR>(triProjected.cl));
+        i->FillTriangle(i, triProjected.p[0].x, triProjected.p[0].y,
+            triProjected.p[1].x, triProjected.p[1].y,
+            triProjected.p[2].x, triProjected.p[2].y,
+            i->PIXEL_SOLID, i->FG_WHITE);
+        i->drawTriangle(triProjected.p[0].x, triProjected.p[0].y,
+            triProjected.p[1].x, triProjected.p[1].y,
+            triProjected.p[2].x, triProjected.p[2].y,
+            i->PIXEL_SOLID, i->FG_BLACK);
     }
 }
 
@@ -131,7 +178,7 @@ void Object3D::CreateMesh()
 bool Object3D::LoadObjectFile(std::string ifName)
 {
     std::ifstream f(ifName);
-    std::ifstream in(ifName, std::ios::binary);
+    //std::ifstream in(ifName, std::ios::binary);
     if (!f.is_open())
         return false;
 
@@ -156,7 +203,7 @@ bool Object3D::LoadObjectFile(std::string ifName)
         {
             int f[3];
             strs >> token >> f[0] >> f[1] >> f[2];
-            meshObject.tri.push_back({vertices[f[0] - 1], vertices[f[1] - 1], vertices[f[2] - 1]});
+            meshObject.tri.push_back({vertices[f[0]-1], vertices[f[1]-1], vertices[f[2]-1]});
         }
     }
     return true;

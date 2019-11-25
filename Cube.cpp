@@ -77,9 +77,10 @@ void Cube::demoCube(Instance* i)
         tempVec2.zk = tempVec2.p[1].z - tempVec2.p[0].z;
 
         normal = getNormalVector(tempVec1, tempVec2);
-        normal.xi /= getVectorMagnitude(normal);
-        normal.yj /= getVectorMagnitude(normal);
-        normal.zk /= getVectorMagnitude(normal);
+        float normalMagnitude = getVectorMagnitude(normal);
+        normal.xi /= normalMagnitude;
+        normal.yj /= normalMagnitude;
+        normal.zk /= normalMagnitude;
 
 
 
@@ -88,11 +89,33 @@ void Cube::demoCube(Instance* i)
                             triTrans.p[0].y - vCamera.yj,
                             triTrans.p[0].z - vCamera.zk)  < 0.0f)
         {
+            //Single direction lighting
+            vector lightDirection;
+            lightDirection.p[0].x = 0.0f;
+            lightDirection.p[0].y = 0.0f;
+            lightDirection.p[0].z = 0.0f;
+            lightDirection.p[1].x = 0.0f;
+            lightDirection.p[1].y = 0.0f;
+            lightDirection.p[1].z = -1.0f;
+            lightDirection.xi = 0.0f;
+            lightDirection.yj = 0.0f;
+            lightDirection.zk = -1.0f;
+            float l = getVectorMagnitude(lightDirection);
+            lightDirection.xi /= l;
+            lightDirection.yj /= l;
+            lightDirection.zk /= l;
+
+            float normalizationLightDirection = fCalcDotProduct(normal, lightDirection);
+
+            CHAR_INFO c = i->getColorFromLux(normalizationLightDirection);
+            triTrans.cl = c.Attributes;
+            triTrans.pxt = c.Char.UnicodeChar;
             //Projection Matrix
             MatrixMultiplier(triTrans.p[0], triProjected.p[0], matProj);
             MatrixMultiplier(triTrans.p[1], triProjected.p[1], matProj);
             MatrixMultiplier(triTrans.p[2], triProjected.p[2], matProj);
-
+            triProjected.cl = triTrans.cl;
+            triProjected.pxt = triTrans.pxt;
             //scale
             triProjected.p[0].x += 1.0f; triProjected.p[0].y += 1.0f;
             triProjected.p[1].x += 1.0f; triProjected.p[1].y += 1.0f;
@@ -108,12 +131,13 @@ void Cube::demoCube(Instance* i)
             i->FillTriangle(i, triProjected.p[0].x, triProjected.p[0].y,
                 triProjected.p[1].x, triProjected.p[1].y,
                 triProjected.p[2].x, triProjected.p[2].y,
-                i->PIXEL_SOLID, i->FG_WHITE);
+                static_cast<GraphicsEngine3D::PIXEL_TYPE>(triProjected.pxt), static_cast<GraphicsEngine3D::COLOR>(triProjected.cl));
 
             i->drawTriangle(triProjected.p[0].x, triProjected.p[0].y,
                 triProjected.p[1].x, triProjected.p[1].y,
                 triProjected.p[2].x, triProjected.p[2].y,
                 i->PIXEL_SOLID, i->FG_BLACK);
+
         }
     }
 }
