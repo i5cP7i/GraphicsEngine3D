@@ -19,4 +19,6 @@ HEADERS += \
     Object3D.h
 
 DISTFILES += \
-    Pyramid.obj
+    Dragonneck.obj \
+    Driehoekkoek.obj \
+    pyramid.obj

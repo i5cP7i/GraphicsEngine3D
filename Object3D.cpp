@@ -90,11 +90,10 @@ void Object3D::demoCustomObject(Instance *i)
         tempVec2.zk = tempVec2.p[1].z - tempVec2.p[0].z;
 
         normal = getNormalVector(tempVec1, tempVec2);
-        normal.xi /= getVectorMagnitude(normal);
-        normal.yj /= getVectorMagnitude(normal);
-        normal.zk /= getVectorMagnitude(normal);
-
-
+        float normalMagnitude = getVectorMagnitude(normal);
+        normal.xi /= normalMagnitude;
+        normal.yj /= normalMagnitude;
+        normal.zk /= normalMagnitude;
 
         if (fCalcDotProduct(normal.xi, normal.yj, normal.zk,
                             triTrans.p[0].x - vCamera.xi,
@@ -130,7 +129,7 @@ void Object3D::demoCustomObject(Instance *i)
             triProjected.cl = triTrans.cl;
             triProjected.pxt = triTrans.pxt;
 
-            //scale
+            // Scale
             triProjected.p[0].x += 1.0f; triProjected.p[0].y += 1.0f;
             triProjected.p[1].x += 1.0f; triProjected.p[1].y += 1.0f;
             triProjected.p[2].x += 1.0f; triProjected.p[2].y += 1.0f;
@@ -176,6 +175,9 @@ bool Object3D::LoadObjectFile(std::string ifName)
 {
     std::ifstream f(ifName);
     //std::ifstream in(ifName, std::ios::binary);
+    //constexpr size_t bufferSize = 1024*1024;
+    //std::unique_ptr<char[]> buffer(new char[bufferSize]);
+
     if (!f.is_open())
         return false;
 
@@ -200,6 +202,7 @@ bool Object3D::LoadObjectFile(std::string ifName)
         {
             int f[3];
             strs >> token >> f[0] >> f[1] >> f[2];
+            //std::cout << f[0] << f[1] << f[2] << std::endl;
             meshObject.tri.push_back({vertices[f[0]-1], vertices[f[1]-1], vertices[f[2]-1]});
         }
     }

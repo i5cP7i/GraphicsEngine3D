@@ -1,7 +1,8 @@
 #pragma once
 #include "GraphicsEngine3D.h"
 #include "Instance.h"
-
+//operator overloading
+//Polygon translation
 class Polygon3D
 {
 public:
@@ -12,8 +13,9 @@ protected:
         float y;
         float z;
     };
-    struct vector
+    class vector
     {
+    public:
         vertex p[2];
         float xi;
         float yj;

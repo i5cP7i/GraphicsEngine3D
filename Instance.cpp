@@ -78,10 +78,10 @@ int Instance::CreateConsoleWindow(int width, int height, int fontSizeX, int font
 // Create objects
 bool Instance::EngineCreate()
 {
-    cube = new Cube(1.0f, 0.0f, 0.0f, 0.0f);
-    cube->setProjectionMatrix(this, 0.1f, 1000.0f, 90.0f);
-    //object3d = new Object3D("C:/Users/11703088/OneDrive - PXL/Electronic_Engineering/EAI2/C++/Individual_project/GraphicsEngine3D/GraphicsEngine3D/Pyramid.obj");
-    //object3d->setProjectionMatrix(this, 0.1f, 1000.0f, 90.0f);
+    //cube = new Cube(1.0f, 0.0f, 0.0f, 0.0f);
+    //cube->setProjectionMatrix(this, 0.1f, 1000.0f, 90.0f);
+    object3d = new Object3D("C:/Users/11703088/OneDrive - PXL/Electronic_Engineering/EAI2/C++/Individual_project/GraphicsEngine3D/GraphicsEngine3D/pyramid.obj");
+    object3d->setProjectionMatrix(this, 0.1f, 1000.0f, 90.0f);
     return true;
 }
 
@@ -90,8 +90,8 @@ bool Instance::EngineUpdate(float fElapsedTime)
 {
     Fill(0, 0, getConsoleWindowWidth(), getConsoleWindowHeight(), PIXEL_SOLID, FG_BLUE);
     // Engine code goes here
-    //object3d->demoCustomObject(this);
-    cube->demoCube(this);
+    object3d->demoCustomObject(this);
+    //cube->demoCube(this);
     return true;
 }
 
@@ -382,7 +382,7 @@ next:
 CHAR_INFO Instance::getColorFromLux(float lux)
 {
         uint16_t bg_col, fg_col;
-        float multiplier = 27.0f;
+        float multiplier = 23.0f;
         wchar_t sym;
         int pixel_bw = (int)(multiplier*lux);
         switch (pixel_bw)
