@@ -1,18 +1,18 @@
 #include "Object3D.h"
 #include <algorithm>
 
-Object3D::Object3D(std::string ifName)
+gre3d::Object3D::Object3D(std::string ifName)
 {
     this->ifName = ifName;
     CreateMesh();
 }
 
-Object3D::~Object3D()
+gre3d::Object3D::~Object3D()
 {
 
 }
 
-void Object3D::setProjectionMatrix(Instance *i, float fZn, float fZf, float fFOV)
+void gre3d::Object3D::setProjectionMatrix(gre3d::Instance *i, float fZn, float fZf, float fFOV)
 {
     this->fAspectRatio = static_cast<float>(i->getConsoleWindowHeight()) / static_cast<float>(i->getConsoleWindowWidth());
     this->fFOVRad = 1.0f / tanf(fFOV * 0.5f / 180.0f * 3.14159f);
@@ -25,7 +25,7 @@ void Object3D::setProjectionMatrix(Instance *i, float fZn, float fZf, float fFOV
     matProj.m[3][3] = 0.0f;
 }
 
-void Object3D::demoCustomObject(Instance *i)
+void gre3d::Object3D::demoCustomObject(gre3d::Instance *i)
 {
     fTheta += 1.0f * i->fElapsedTime;
     //Rotation z
@@ -166,12 +166,12 @@ void Object3D::demoCustomObject(Instance *i)
     }
 }
 
-void Object3D::CreateMesh()
+void gre3d::Object3D::CreateMesh()
 {
     LoadObjectFile(this->ifName);
 }
 
-bool Object3D::LoadObjectFile(std::string ifName)
+bool gre3d::Object3D::LoadObjectFile(std::string ifName)
 {
     std::ifstream f(ifName);
     //std::ifstream in(ifName, std::ios::binary);

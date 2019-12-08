@@ -1,6 +1,6 @@
 #include "Cube.h"
 
-Cube::Cube(float fSideLength, float fOriginX, float fOriginY, float fOriginZ)
+gre3d::Cube::Cube(float fSideLength, float fOriginX, float fOriginY, float fOriginZ)
 {
     this->fSideLength = fSideLength;
     this->fOriginX = fOriginX;
@@ -9,12 +9,12 @@ Cube::Cube(float fSideLength, float fOriginX, float fOriginY, float fOriginZ)
     CreateMesh();
 }
 
-Cube::~Cube()
+gre3d::Cube::~Cube()
 {
 
 }
 
-void Cube::demoCube(Instance* i)
+void gre3d::Cube::demoCube(gre3d::Instance* i)
 {
     fTheta += 1.0f * i->fElapsedTime;
     //Rotation z
@@ -142,7 +142,7 @@ void Cube::demoCube(Instance* i)
     }
 }
 
-void Cube::CreateMesh()
+void gre3d::Cube::CreateMesh()
 {
     meshCube.tri = {
 
@@ -172,7 +172,7 @@ void Cube::CreateMesh()
 
     };
 }
-void Cube::setProjectionMatrix(Instance *i, float fZn, float fZf, float fFOV)
+void gre3d::Cube::setProjectionMatrix(Instance *i, float fZn, float fZf, float fFOV)
 {
     this->fAspectRatio = static_cast<float>(i->getConsoleWindowHeight()) / static_cast<float>(i->getConsoleWindowWidth());
     this->fFOVRad = 1.0f / tanf(fFOV * 0.5f / 180.0f * 3.14159f);

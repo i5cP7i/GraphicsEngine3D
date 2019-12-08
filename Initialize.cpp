@@ -1,15 +1,19 @@
 #include "Initialize.h"
 
-Initialize::Initialize()
+gre3d::Initialize::Initialize()
 {
 
 }
 
-Initialize::~Initialize()
+gre3d::Initialize::~Initialize()
 {
+    for (auto iterator = instances.begin(); iterator != instances.end(); ++iterator)
+    {
+        instances.erase(iterator);
+    }
 }
 
-void Initialize::initInstance(Instance * newInstance, uint8_t ID)
+void gre3d::Initialize::initInstance(Instance * newInstance, uint8_t ID)
 {
     newInstance->c_AppName = ID;
     if (newInstance->CreateConsoleWindow(360, 180, 4, 4))
@@ -19,7 +23,7 @@ void Initialize::initInstance(Instance * newInstance, uint8_t ID)
     }
 }
 
-std::vector<Instance*> Initialize::getInstance() const
+std::vector<gre3d::Instance*> gre3d::Initialize::getInstance() const
 {
     return std::vector<Instance*>(instances);
 }
