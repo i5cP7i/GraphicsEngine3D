@@ -87,7 +87,13 @@ bool Instance::EngineUpdate(float fElapsedTime)
 {
     Fill(0, 0, getConsoleWindowWidth(), getConsoleWindowHeight(), PIXEL_SOLID, FG_BLACK);
     // Engine code goes here
+<<<<<<< Updated upstream
     cube->demoCube(this);
+=======
+    object3d->demoCustomObject(this);
+
+    //cube->demoCube(this);
+>>>>>>> Stashed changes
     return true;
 }
 
