@@ -15,7 +15,6 @@ namespace gre3d {
     public:
         void setProjectionMatrix(gre3d::Instance *i, float fZn, float fZf, float fFOV);
         void demoCustomObject(gre3d::Instance*);
-        void setCameraVector(float xi, float yj, float zk) { vCamera.xi = xi; vCamera.yj = yj; vCamera.zk = zk;  }
     protected:
        virtual void CreateMesh();
     private:

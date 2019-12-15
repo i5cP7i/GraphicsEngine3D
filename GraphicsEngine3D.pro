@@ -7,11 +7,18 @@ SOURCES += \
     Cube.cpp \
     Initialize.cpp \
     Instance.cpp \
-    main.cpp
+    main.cpp \
+    Object3D.cpp
 
 HEADERS += \
     Cube.h \
     GraphicsEngine3D.h \
     Initialize.h \
     Instance.h \
-    Polygon3D.h
+    Polygon3D.h \
+    Object3D.h
+
+DISTFILES += \
+    Dragonneck.obj \
+    Driehoekkoek.obj \
+    pyramid.obj

@@ -1,13 +1,14 @@
 #include "Instance.h"
 #include "Initialize.h"
 #include "Cube.h"
-#include "math.h"
+#include "Object3D.h"
 
-std::atomic<bool> Instance::bAtomicActive;
-std::condition_variable Instance::EngineFinished;
-std::mutex Instance::muxEngine;
+//statics
+std::atomic<bool> gre3d::Instance::bAtomicActive;
+std::condition_variable gre3d::Instance::EngineFinished;
+std::mutex gre3d::Instance::muxEngine;
 
-Instance::Instance(unsigned char id) : GraphicsEngine3D (id)
+gre3d::Instance::Instance(unsigned char id) : GraphicsEngine3D (id)
 {
     c_ScreenWidth = 320;
     c_ScreenHeight = 180;
@@ -17,14 +18,15 @@ Instance::Instance(unsigned char id) : GraphicsEngine3D (id)
 
     c_AppName = L"Graphics Engine 3D";
 }
-Instance::~Instance()
+gre3d::Instance::~Instance()
 {
-    delete cube;
-    delete c_ScreenBuffer;
+    delete object3d;
+
     SetConsoleActiveScreenBuffer(c_OriginalConsole);
-    EngineFinished.notify_one();
+    delete[] c_ScreenBuffer;
+    //EngineFinished.notify_one();
 }
-int Instance::CreateConsoleWindow(int width, int height, int fontSizeX, int fontSizeY)
+int gre3d::Instance::CreateConsoleWindow(int width, int height, int fontSizeX, int fontSizeY)
 {
     //TODO error
     if (c_ConsoleOut == INVALID_HANDLE_VALUE)
@@ -64,6 +66,7 @@ int Instance::CreateConsoleWindow(int width, int height, int fontSizeX, int font
     //Allocate memory for screen buffer
     c_ScreenBuffer = new CHAR_INFO[c_ScreenWidth * c_ScreenHeight];
     memset(c_ScreenBuffer, 0, sizeof(CHAR_INFO) * c_ScreenWidth * c_ScreenHeight);
+
     //Mouse Input
     GetConsoleCursorInfo(c_ConsoleOut, &c_ConsoleCursorInfo);
     c_ConsoleCursorInfo.bVisible = false;
@@ -75,34 +78,31 @@ int Instance::CreateConsoleWindow(int width, int height, int fontSizeX, int font
 }
 
 // Create objects
-bool Instance::EngineCreate()
+bool gre3d::Instance::EngineCreate()
 {
-    cube = new Cube(1.0f, 0.0f, 0.0f, 0.0f);
-    cube->setProjectionMatrix(this, 0.1f, 1000.0f, 90.0f);
+    //cube = new Cube(1.0f, 0.0f, 0.0f, 0.0f);
+    //cube->setProjectionMatrix(this, 0.1f, 1000.0f, 90.0f);
+    object3d = new Object3D("C:/Users/11703088/OneDrive - PXL/Electronic_Engineering/EAI2/C++/Individual_project/GraphicsEngine3D/GraphicsEngine3D/pyramid.obj");
+    object3d->setProjectionMatrix(this, 0.1f, 1000.0f, 90.0f);
     return true;
 }
 
 // Update the screen
-bool Instance::EngineUpdate(float fElapsedTime)
+bool gre3d::Instance::EngineUpdate(float fElapsedTime)
 {
-    Fill(0, 0, getConsoleWindowWidth(), getConsoleWindowHeight(), PIXEL_SOLID, FG_BLACK);
+    Fill(0, 0, getConsoleWindowWidth(), getConsoleWindowHeight(), PIXEL_SOLID, FG_BLUE);
     // Engine code goes here
-<<<<<<< Updated upstream
-    cube->demoCube(this);
-=======
     object3d->demoCustomObject(this);
-
     //cube->demoCube(this);
->>>>>>> Stashed changes
     return true;
 }
 
-const std::wstring Instance::getConsoleAppName() const noexcept
+const std::wstring gre3d::Instance::getConsoleAppName() const
 {
     return c_AppName;
 }
 
-BOOL Instance::CloseHandler(DWORD evt)
+BOOL gre3d::Instance::CloseHandler(DWORD evt)
 {
     if (evt == CTRL_CLOSE_EVENT)
     {
@@ -113,24 +113,25 @@ BOOL Instance::CloseHandler(DWORD evt)
     return true;
 }
 
-int Instance::getConsoleWindowWidth() const
+int gre3d::Instance::getConsoleWindowWidth() const
 {
     return c_ScreenWidth;
 }
 
-int Instance::getConsoleWindowHeight() const
+int gre3d::Instance::getConsoleWindowHeight() const
 {
     return c_ScreenHeight;
 }
 
-void Instance::StartThread(Instance &i)
+void gre3d::Instance::StartThread(Instance &i)
 {
     bAtomicActive = true;
     std::thread t = std::thread(&Instance::InstanceThread, i);
+
     t.join();
 }
 
-void Instance::InstanceThread()
+void gre3d::Instance::InstanceThread()
 {
     if (!EngineCreate())
         bAtomicActive = false;
@@ -140,6 +141,9 @@ void Instance::InstanceThread()
 
     while (bAtomicActive)
     {
+        if (GetKeyState(VK_ESCAPE) & WM_KEYDOWN)
+            bAtomicActive = false;
+
         t2 = std::chrono::system_clock::now();
         std::chrono::duration<float> delta_t = t2 - t1;
         t1 = t2;
@@ -159,18 +163,18 @@ void Instance::InstanceThread()
 }
 
 
-int Instance::ErrMsg(const wchar_t * msg)
+int gre3d::Instance::ErrMsg(const wchar_t * msg)
 {
     //TODO
     return 0;
 }
 
-void Instance::drawLine(int x1, int y1, int x2, int y2)
+void gre3d::Instance::drawLine(int x1, int y1, int x2, int y2)
 {
     drawLine(x1, y1, x2, y2, GraphicsEngine3D::PIXEL_TYPE::PIXEL_SOLID, GraphicsEngine3D::COLOR::FG_WHITE);
 }
 
-void Instance::drawLine(int x1, int y1, int x2, int y2, GraphicsEngine3D::PIXEL_TYPE pxt, GraphicsEngine3D::COLOR cl)
+void gre3d::Instance::drawLine(int x1, int y1, int x2, int y2, GraphicsEngine3D::PIXEL_TYPE pxt, GraphicsEngine3D::COLOR cl)
 {
     int x, y, dx, dy, dx1, dy1, px, py, xe, ye, i;
     dx = x2 - x1; dy = y2 - y1;
@@ -222,28 +226,208 @@ void Instance::drawLine(int x1, int y1, int x2, int y2, GraphicsEngine3D::PIXEL_
     }
 }
 
-void Instance::drawTriangle(int x1, int y1, int x2, int y2, int x3, int y3)
+void gre3d::Instance::drawTriangle(int x1, int y1, int x2, int y2, int x3, int y3)
 {
     drawTriangle(x1, y1, x2, y2, x3, y3, GraphicsEngine3D::PIXEL_TYPE::PIXEL_SOLID, GraphicsEngine3D::COLOR::FG_WHITE);
 }
-
-void Instance::drawTriangle(int x1, int y1, int x2, int y2, int x3, int y3, GraphicsEngine3D::PIXEL_TYPE pxt, GraphicsEngine3D::COLOR cl)
+void gre3d::Instance::drawTriangle(int x1, int y1, int x2, int y2, int x3, int y3, GraphicsEngine3D::PIXEL_TYPE pxt, GraphicsEngine3D::COLOR cl)
 {
     drawLine(x1, y1, x2, y2, pxt, cl);
     drawLine(x2, y2, x3, y3, pxt, cl);
     drawLine(x3, y3, x1, y1, pxt, cl);
 }
+void gre3d::Instance::FillTriangle(Instance *instance, int x1, int y1, int x2, int y2, int x3, int y3)
+{
+    FillTriangle(instance, x1, y1, x2, y2, x3, y3, GraphicsEngine3D::PIXEL_TYPE::PIXEL_SOLID, GraphicsEngine3D::COLOR::FG_WHITE);
+}
+void gre3d::Instance::FillTriangle(Instance *instance, int x1, int y1, int x2, int y2, int x3, int y3, GraphicsEngine3D::PIXEL_TYPE pxt, GraphicsEngine3D::COLOR cl)
+{
+    auto SWAP = [](int &x, int &y) { int t = x; x = y; y = t; };
+    auto drawline = [&](int sx, int ex, int ny)
+    {
+        for (int i = sx; i <= ex; i++)
+        {
+            instance->draw(i, ny, pxt, cl);
+        }
+        return 1;
+    };
 
-void Instance::drawCircle()
+    int t1x, t2x, y, minx, maxx, t1xp, t2xp;
+    bool changed1 = false;
+    bool changed2 = false;
+    int signx1, signx2, dx1, dy1, dx2, dy2;
+    int e1, e2;
+    // Sort vertices
+    if (y1>y2) { SWAP(y1, y2); SWAP(x1, x2); }
+    if (y1>y3) { SWAP(y1, y3); SWAP(x1, x3); }
+    if (y2>y3) { SWAP(y2, y3); SWAP(x2, x3); }
+
+    t1x = t2x = x1; y = y1;   // Starting points
+    dx1 = (int)(x2 - x1); if (dx1<0) { dx1 = -dx1; signx1 = -1; }
+    else signx1 = 1;
+    dy1 = (int)(y2 - y1);
+
+    dx2 = (int)(x3 - x1); if (dx2<0) { dx2 = -dx2; signx2 = -1; }
+    else signx2 = 1;
+    dy2 = (int)(y3 - y1);
+
+    if (dy1 > dx1) {   // swap values
+        SWAP(dx1, dy1);
+        changed1 = true;
+    }
+    if (dy2 > dx2) {   // swap values
+        SWAP(dy2, dx2);
+        changed2 = true;
+    }
+
+    e2 = (int)(dx2 >> 1);
+    // Flat top, just process the second half
+    if (y1 == y2) goto next;
+    e1 = (int)(dx1 >> 1);
+
+    for (int i = 0; i < dx1;) {
+        t1xp = 0; t2xp = 0;
+        if (t1x<t2x) { minx = t1x; maxx = t2x; }
+        else { minx = t2x; maxx = t1x; }
+        // process first line until y value is about to change
+        while (i<dx1) {
+            i++;
+            e1 += dy1;
+            while (e1 >= dx1) {
+                e1 -= dx1;
+                if (changed1) t1xp = signx1;//t1x += signx1;
+                else          goto next1;
+            }
+            if (changed1) break;
+            else t1x += signx1;
+        }
+        // Move line
+    next1:
+        // process second line until y value is about to change
+        while (1) {
+            e2 += dy2;
+            while (e2 >= dx2) {
+                e2 -= dx2;
+                if (changed2) t2xp = signx2;//t2x += signx2;
+                else          goto next2;
+            }
+            if (changed2)     break;
+            else              t2x += signx2;
+        }
+    next2:
+        if (minx>t1x) minx = t1x; if (minx>t2x) minx = t2x;
+        if (maxx<t1x) maxx = t1x; if (maxx<t2x) maxx = t2x;
+        drawline(minx, maxx, y);    // Draw line from min to max points found on the y
+                                     // Now increase y
+        if (!changed1) t1x += signx1;
+        t1x += t1xp;
+        if (!changed2) t2x += signx2;
+        t2x += t2xp;
+        y += 1;
+        if (y == y2) break;
+
+    }
+    next:
+    // Second half
+    dx1 = (int)(x3 - x2); if (dx1<0) { dx1 = -dx1; signx1 = -1; }
+    else signx1 = 1;
+    dy1 = (int)(y3 - y2);
+    t1x = x2;
+
+    if (dy1 > dx1) {   // swap values
+        SWAP(dy1, dx1);
+        changed1 = true;
+    }
+    else changed1 = false;
+
+    e1 = (int)(dx1 >> 1);
+
+    for (int i = 0; i <= dx1; i++) {
+        t1xp = 0; t2xp = 0;
+        if (t1x<t2x) { minx = t1x; maxx = t2x; }
+        else { minx = t2x; maxx = t1x; }
+        // process first line until y value is about to change
+        while (i<dx1) {
+            e1 += dy1;
+            while (e1 >= dx1) {
+                e1 -= dx1;
+                if (changed1) { t1xp = signx1; break; }//t1x += signx1;
+                else          goto next3;
+            }
+            if (changed1) break;
+            else   	   	  t1x += signx1;
+            if (i<dx1) i++;
+        }
+    next3:
+        // process second line until y value is about to change
+        while (t2x != x3) {
+            e2 += dy2;
+            while (e2 >= dx2) {
+                e2 -= dx2;
+                if (changed2) t2xp = signx2;
+                else          goto next4;
+            }
+            if (changed2)     break;
+            else              t2x += signx2;
+        }
+    next4:
+
+        if (minx>t1x) minx = t1x; if (minx>t2x) minx = t2x;
+        if (maxx<t1x) maxx = t1x; if (maxx<t2x) maxx = t2x;
+        drawline(minx, maxx, y);
+        if (!changed1) t1x += signx1;
+        t1x += t1xp;
+        if (!changed2) t2x += signx2;
+        t2x += t2xp;
+        y += 1;
+        if (y>y3) return;
+    }
+}
+
+CHAR_INFO gre3d::Instance::getColorFromLux(float lux)
+{
+        uint16_t bg_col, fg_col;
+        float multiplier = 23.0f;
+        wchar_t sym;
+        int pixel_bw = (int)(multiplier*lux);
+        switch (pixel_bw)
+        {
+        case 0: bg_col = BG_BLACK; fg_col = FG_BLACK; sym = PIXEL_SOLID; break;
+
+        case 1: bg_col = BG_BLACK; fg_col = FG_DARK_GRAY; sym = PIXEL_QUARTER; break;
+        case 2: bg_col = BG_BLACK; fg_col = FG_DARK_GRAY; sym = PIXEL_HALF; break;
+        case 3: bg_col = BG_BLACK; fg_col = FG_DARK_GRAY; sym = PIXEL_THREEQUARTERS; break;
+        case 4: bg_col = BG_BLACK; fg_col = FG_DARK_GRAY; sym = PIXEL_SOLID; break;
+
+        case 5: bg_col = BG_DARK_GRAY; fg_col = FG_GRAY; sym = PIXEL_QUARTER; break;
+        case 6: bg_col = BG_DARK_GRAY; fg_col = FG_GRAY; sym = PIXEL_HALF; break;
+        case 7: bg_col = BG_DARK_GRAY; fg_col = FG_GRAY; sym = PIXEL_THREEQUARTERS; break;
+        case 8: bg_col = BG_DARK_GRAY; fg_col = FG_GRAY; sym = PIXEL_SOLID; break;
+
+        case 9:  bg_col = BG_GRAY; fg_col = FG_WHITE; sym = PIXEL_QUARTER; break;
+        case 10: bg_col = BG_GRAY; fg_col = FG_WHITE; sym = PIXEL_HALF; break;
+        case 11: bg_col = BG_GRAY; fg_col = FG_WHITE; sym = PIXEL_THREEQUARTERS; break;
+        case 12: bg_col = BG_GRAY; fg_col = FG_WHITE; sym = PIXEL_SOLID; break;
+        default:
+            bg_col = BG_BLACK; fg_col = FG_BLACK; sym = PIXEL_SOLID;
+        }
+
+        CHAR_INFO c;
+        c.Attributes = bg_col | fg_col;
+        c.Char.UnicodeChar = sym;
+        return c;
+    }
+
+void gre3d::Instance::drawCircle()
 {
 }
 
-void Instance::draw(int x, int y)
+void gre3d::Instance::draw(int x, int y)
 {
     draw(x, y, GraphicsEngine3D::PIXEL_TYPE::PIXEL_SOLID, GraphicsEngine3D::COLOR::FG_WHITE);
 }
 
-void Instance::draw(int x, int y, GraphicsEngine3D::PIXEL_TYPE pxt, GraphicsEngine3D::COLOR cl)
+void gre3d::Instance::draw(int x, int y, GraphicsEngine3D::PIXEL_TYPE pxt, GraphicsEngine3D::COLOR cl)
 {
     if ((x >= 0 && x < c_ScreenWidth) && (y >= 0 && y < c_ScreenHeight))
     {
@@ -252,12 +436,12 @@ void Instance::draw(int x, int y, GraphicsEngine3D::PIXEL_TYPE pxt, GraphicsEngi
     }
 }
 
-void Instance::Fill(int x1, int y1, int x2, int y2)
+void gre3d::Instance::Fill(int x1, int y1, int x2, int y2)
 {
     Fill(x1, y1, x2, y2, GraphicsEngine3D::PIXEL_TYPE::PIXEL_SOLID, GraphicsEngine3D::COLOR::FG_WHITE);
 }
 
-void Instance::Fill(int x1, int y1, int x2, int y2, GraphicsEngine3D::PIXEL_TYPE pxt, GraphicsEngine3D::COLOR cl)
+void gre3d::Instance::Fill(int x1, int y1, int x2, int y2, GraphicsEngine3D::PIXEL_TYPE pxt, GraphicsEngine3D::COLOR cl)
 {
     Clip(x1, y1);
     Clip(x2, y2);
@@ -266,7 +450,7 @@ void Instance::Fill(int x1, int y1, int x2, int y2, GraphicsEngine3D::PIXEL_TYPE
             draw(x, y, pxt, cl);
 }
 
-void Instance::Clip(int &x, int &y)
+void gre3d::Instance::Clip(int &x, int &y)
 {
     if (x < 0)
     {
