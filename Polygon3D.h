@@ -1,5 +1,4 @@
 #pragma once
-#include "GraphicsEngine3D.h"
 #include "Instance.h"
 //operator overloading
 //Polygon translation
@@ -29,9 +28,16 @@ namespace gre3d {
             uint16_t pxt;
             uint16_t cl;
         };
+        struct rectangle
+        {
+            vertex p[4];
+            uint16_t pxt;
+            uint16_t cl;
+        };
         struct mesh
         {
             std::vector<triangle> tri;
+            std::vector<polygon> poly;
         };
         struct mat4x4
         {

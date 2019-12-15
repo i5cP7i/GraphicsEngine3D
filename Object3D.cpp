@@ -201,7 +201,7 @@ bool gre3d::Object3D::LoadObjectFile(std::string ifName)
         if (line[0] == 'f')
         {
             int f[3];
-            strs >> token >> f[0] >> f[1] >> f[2];
+            strs >> token >> f[0] >> f[1] >> f[2] >> f[3];
             //std::cout << f[0] << f[1] << f[2] << std::endl;
             meshObject.tri.push_back({vertices[f[0]-1], vertices[f[1]-1], vertices[f[2]-1]});
         }
