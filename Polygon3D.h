@@ -37,7 +37,6 @@ namespace gre3d {
         struct mesh
         {
             std::vector<triangle> tri;
-            std::vector<polygon> poly;
         };
         struct mat4x4
         {
