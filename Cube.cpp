@@ -8,7 +8,7 @@ gre3d::Cube::Cube(float fSideLength, float fOriginX, float fOriginY, float fOrig
     this->fOriginZ = fOriginZ;
     CreateMesh();
 }
-
+// LOL ez grades
 gre3d::Cube::~Cube()
 {
 
