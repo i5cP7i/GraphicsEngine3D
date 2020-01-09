@@ -13,7 +13,7 @@ namespace gre3d {
     public:
         void demoCube(Instance*);
         void setProjectionMatrix(Instance *i, float fZn, float fZf, float fFOV);
-        void setDrawingMode();
+        // setDrawingMode();
     protected:
         void CreateMesh() override;
     private:

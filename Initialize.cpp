@@ -23,7 +23,7 @@ void gre3d::Initialize::initInstance(Instance * newInstance, uint8_t ID)
     }
 }
 
-std::vector<gre3d::Instance*> gre3d::Initialize::getInstance() const
+std::vector<gre3d::Instance *> gre3d::Initialize::getInstance() const
 {
     return std::vector<Instance*>(instances);
 }

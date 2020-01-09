@@ -1,5 +1,6 @@
 #include "Cube.h"
 
+// Construct the cube and assign its parameters
 gre3d::Cube::Cube(float fSideLength, float fOriginX, float fOriginY, float fOriginZ)
 {
     this->fSideLength = fSideLength;
@@ -83,7 +84,9 @@ void gre3d::Cube::demoCube(gre3d::Instance* i)
         normal.zk /= normalMagnitude;
 
 
-
+        // if normal of translated tris are not aligned with the camera and points toward the camera
+        // then draw the tris and fill them in dark to bright w/r to the alignment of the light direction
+        // and the normal.
         if (fCalcDotProduct(normal.xi, normal.yj, normal.zk,
                             triTrans.p[0].x - vCamera.xi,
                             triTrans.p[0].y - vCamera.yj,
@@ -142,6 +145,7 @@ void gre3d::Cube::demoCube(gre3d::Instance* i)
     }
 }
 
+// Vertices of the cube are stored here
 void gre3d::Cube::CreateMesh()
 {
     meshCube.tri = {
@@ -172,6 +176,8 @@ void gre3d::Cube::CreateMesh()
 
     };
 }
+
+// Set projection matrix for the cube
 void gre3d::Cube::setProjectionMatrix(Instance *i, float fZn, float fZf, float fFOV)
 {
     this->fAspectRatio = static_cast<float>(i->getConsoleWindowHeight()) / static_cast<float>(i->getConsoleWindowWidth());

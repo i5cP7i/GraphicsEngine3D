@@ -20,7 +20,7 @@ gre3d::Instance::Instance(unsigned char id) : GraphicsEngine3D (id)
 }
 gre3d::Instance::~Instance()
 {
-    delete object3d;
+    //delete object3d;
 
     SetConsoleActiveScreenBuffer(c_OriginalConsole);
     delete[] c_ScreenBuffer;
@@ -236,6 +236,27 @@ void gre3d::Instance::drawTriangle(int x1, int y1, int x2, int y2, int x3, int y
     drawLine(x2, y2, x3, y3, pxt, cl);
     drawLine(x3, y3, x1, y1, pxt, cl);
 }
+
+void gre3d::Instance::drawRectangle(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4)
+{
+    drawRectangle(x1, y1, x2, y2, x3, y3, x4, y4, GraphicsEngine3D::PIXEL_TYPE::PIXEL_SOLID, GraphicsEngine3D::COLOR::FG_WHITE);
+}
+void gre3d::Instance::drawRectangle(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, gre3d::GraphicsEngine3D::PIXEL_TYPE pxt, gre3d::GraphicsEngine3D::COLOR cl)
+{
+    drawTriangle(x2, y2, x3, y3, x1, y1, pxt, cl);
+    drawTriangle(x2, y2, x4, y4, x3, y3, pxt, cl);
+}
+
+void gre3d::Instance::FillRectangle(Instance *instance, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4)
+{
+    FillRectangle(instance, x1, y1, x2, y2, x3, y3, x4, y4, GraphicsEngine3D::PIXEL_TYPE::PIXEL_SOLID, GraphicsEngine3D::COLOR::FG_WHITE);
+}
+void gre3d::Instance::FillRectangle(Instance *instance, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, gre3d::GraphicsEngine3D::PIXEL_TYPE pxt, gre3d::GraphicsEngine3D::COLOR cl)
+{
+    FillTriangle(instance, x2, y2, x3, y3, x1, y1, pxt, cl);
+    FillTriangle(instance, x2, y2, x4, y4, x3, y3, pxt, cl);
+}
+
 void gre3d::Instance::FillTriangle(Instance *instance, int x1, int y1, int x2, int y2, int x3, int y3)
 {
     FillTriangle(instance, x1, y1, x2, y2, x3, y3, GraphicsEngine3D::PIXEL_TYPE::PIXEL_SOLID, GraphicsEngine3D::COLOR::FG_WHITE);
@@ -372,15 +393,23 @@ void gre3d::Instance::FillTriangle(Instance *instance, int x1, int y1, int x2, i
         }
     next4:
 
-        if (minx>t1x) minx = t1x; if (minx>t2x) minx = t2x;
-        if (maxx<t1x) maxx = t1x; if (maxx<t2x) maxx = t2x;
+        if (minx>t1x)
+            minx = t1x;
+        if (minx>t2x)
+            minx = t2x;
+        if (maxx<t1x)
+            maxx = t1x;
+        if (maxx<t2x)
+            maxx = t2x;
         drawline(minx, maxx, y);
+
         if (!changed1) t1x += signx1;
-        t1x += t1xp;
+            t1x += t1xp;
         if (!changed2) t2x += signx2;
-        t2x += t2xp;
+            t2x += t2xp;
         y += 1;
-        if (y>y3) return;
+        if (y>y3)
+            return;
     }
 }
 
